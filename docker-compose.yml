@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: fitscore-postgres
+    environment:
+      POSTGRES_DB: fitscore
+      POSTGRES_USER: fitscore
+      POSTGRES_PASSWORD: fitscore
+    ports:
+      - "5433:5432"
+    volumes:
+      - fitscore-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: fitscore-redis
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    container_name: fitscore-app
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/fitscore
+      SPRING_DATA_REDIS_HOST: redis
+      # Read from your shell or from a .env file next to this compose file
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.3-70b-versatile}
+
+volumes:
+  fitscore-data:

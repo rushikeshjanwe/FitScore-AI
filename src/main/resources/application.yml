@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: fitscore-ai
+
+  config:
+    # Reads GROQ_API_KEY from a .env file in the project folder (if present)
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/fitscore
+    username: fitscore
+    password: fitscore
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+  ai:
+    openai:
+      # Groq exposes an OpenAI-compatible API, so Spring AI's OpenAI client works with it.
+      # Spring AI 1.1.x adds /v1/chat/completions itself, so the base URL has no /v1.
+      base-url: https://api.groq.com/openai
+      api-key: ${GROQ_API_KEY}
+      chat:
+        options:
+          model: ${GROQ_MODEL:llama-3.3-70b-versatile}
+          temperature: 0.0
+
+fitscore:
+  cache:
+    ttl-hours: 24
